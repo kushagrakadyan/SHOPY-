@@ -1,5 +1,10 @@
 const { createClient } = require('redis');
 
+if (!process.env.REDIS_HOSTED_URL) {
+    module.exports = Promise.resolve(null);
+    return;
+}
+
 const redisClient = createClient({
     url: process.env.REDIS_HOSTED_URL 
 });
@@ -12,8 +17,8 @@ const redisClientPromise = redisClient.connect()
         return redisClient;
     })
     .catch((err) => {
-        console.error('Failed to connect to Redis:', err);
-        throw err;
+        console.error('Failed to connect to Redis:', err.message);
+        return null;
     });
 
 module.exports = redisClientPromise;

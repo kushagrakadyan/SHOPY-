@@ -1,6 +1,11 @@
+const dotenv = require('dotenv');
+const path = require('path');
+
+// config
+dotenv.config({ path: path.resolve(__dirname, 'config/config.env') });
+
 const app = require('./app');
 // const cronJob = require('./cronJob');
-const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -13,13 +18,14 @@ const redisClient = require('./config/redisClient');
 //     process.exit(1);
 // })
 
-// config
-dotenv.config({ path: './backend/config/config.env' });
-
 const createServer = http.createServer(app);
 const io = new Server(createServer, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: (process.env.FRONTEND_URL || "http://localhost:3000")
+            .split(',')
+            .map((origin) => origin.trim())
+            .filter(Boolean),
+        credentials: true,
     }
 });
 
@@ -29,7 +35,7 @@ app.set('redisClient', redisClient);
 //connecting to database
 connectDB();
 
-const server = app.listen(process.env.PORT || 8080, () => {
+const server = createServer.listen(process.env.PORT || 8080, () => {
     console.log(`✅ Server is working on http://localhost:${process.env.PORT || 8080}`)
 })
 

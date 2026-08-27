@@ -6,6 +6,8 @@ const cors = require("cors");
 const errorMiddleware = require("./middleware/error");
 const multer = require("multer");
 const url = require("url");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "config/config.env") });
 const {
   S3Client,
   PutObjectCommand,
@@ -22,7 +24,6 @@ const jwt = require("jsonwebtoken");
 const Snowflake = require("@theinternetfolks/snowflake");
 const { generateEmbedding } = require('./utils/generateEmbedding');
 const redisClientPromise = require('./config/redisClientUpstash');
-require("dotenv").config({ path: "./config/config.env" });
 
 app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
@@ -34,17 +35,30 @@ app.use(
   }),
 );
 
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Requests without an Origin header include local tools and health checks.
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} is not allowed by CORS`));
+    },
+    credentials: true,
+    methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  }),
+);
+
 // s3.config.update({
 //     region: process.env.AWS_BUCKET_REGION,
 //     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
 //     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 // });
-
-// Initialize S3 client
-const s3 = new S3Client({
-  region: process.env.AWS_BUCKET_REGION,
-  credentials: fromEnv(),
-});
 
 // Configure Multer for file uploads
 const upload = multer({
@@ -81,26 +95,6 @@ app.use("/api/v1", orderRoute);
 app.use("/api/v1", paymentRoute);
 app.use("/api/v1", couponRoute);
 
-// CORS
-app.use(async (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept",
-  );
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Methods", "*");
-  return next();
-});
-
-const corsOptions = {
-  origin: ["http://localhost:3000", "https://orderplanning.netlify.app/"],
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
 process.noDeprecation = true;
 
 // middleware for error
@@ -109,10 +103,6 @@ app.use(errorMiddleware);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Internal Server Error");
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello, welcome to my API!");
 });
 
 app.get("/api/v1/health", (req, res) => {
@@ -631,5 +621,12 @@ app.delete(
     }
   },
 );
+
+// Serve Frontend Static Files
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"));
+});
 
 module.exports = app;

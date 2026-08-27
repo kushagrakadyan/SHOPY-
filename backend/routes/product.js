@@ -46,7 +46,8 @@ router
 
 router.route('/review/:reviewId').delete(isAuthUser, deleteReview);
 
-router.route('/:id/summerize-reviews').post(isAuthUser, authRoles('admin'), summerizeProductReviews);
+// Keep the API spelling consistent with the frontend action and public docs.
+router.route('/products/:id/summarize-reviews').post(isAuthUser, authRoles('admin'), summerizeProductReviews);
 
 router.route("/search").get(searchProducts);
 
