@@ -15,6 +15,7 @@ import { addProductToWishlist, clearErrors, fetchWishlist, getProductDetails, ne
 import { NEW_REVIEW_RESET, REALTIME_PRODUCT_UPDATE, SUMMARIZE_REVIEWS_RESET } from '../../constants/productConstants';
 import MetaData from '../layout/MetaData';
 import ReviewCard from './ReviewCard';
+import RecommendedProducts from './RecommendedProducts';
 
 import './ProductDetails.css';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
@@ -316,6 +317,8 @@ const ProductDetails = () => {
                             </div>
                         </div>
                     )}
+
+                    <RecommendedProducts productId={id} />
 
                     <Dialog
                         aria-labelledby='simple-dialog-title'
