@@ -22,16 +22,31 @@ exports.getAllProducts = async (req, res) => {
     try {
         const resultPerPage = Number(process.env.RESULT_PER_PAGE) || 12;
         const productsCount = await Product.countDocuments();
-        const filteredQuery = new ApiFeatures(Product.find(), req.query).search().filter();
+        const filteredQuery = new ApiFeatures(Product.find(), req.query).search().filter().sort();
         const filteredProductsCount = await filteredQuery.query.clone().countDocuments();
+        const parsedLimit = Number(req.query.limit);
+        const limit = Number.isInteger(parsedLimit) && parsedLimit > 0
+            ? Math.min(parsedLimit, 50)
+            : resultPerPage;
+        const parsedPage = Number(req.query.page);
+        const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+        const totalPages = Math.ceil(filteredProductsCount / limit);
         const products = await filteredQuery.pagination(resultPerPage).query;
+        const categories = await Product.distinct('category');
 
         res.status(200).json({
             success: true,
             products,
             productsCount,
             resultPerPage,
-            filteredProductsCount
+            filteredProductsCount,
+            currentPage,
+            totalPages,
+            facets: {
+                categories: {
+                    buckets: categories.map((category) => ({ key: category }))
+                }
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

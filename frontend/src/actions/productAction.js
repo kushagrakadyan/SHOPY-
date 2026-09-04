@@ -47,23 +47,28 @@ import { ADD_PRODUCT_TO_WISHLIST_FAIL,
 } from '../constants/productConstants';
 
 // Get All Products
-export const getProduct = (
-    keyword = '',
-    currentPage = 1,
-    price = [0, 999999],
-    category,
-    ratings = 0
-) => async dispatch => {
+export const getProduct = (filters = {}) => async dispatch => {
     try {
         dispatch({ type: ALL_PRODUCT_REQUEST });
 
-        let link = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&ratings[gte]=${ratings}`;
+        const params = new URLSearchParams();
+        const {
+            keyword = '', category = '', priceMin, priceMax,
+            ratingMin, availability = 'all', sort = 'newest',
+            page = 1, limit = 8
+        } = filters;
 
-        if (category) {
-            link = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&category=${category}&ratings[gte]=${ratings}`;
-        }
+        if (keyword) params.set('keyword', keyword);
+        if (category) params.set('category', category);
+        if (Number.isFinite(Number(priceMin))) params.set('price[gte]', priceMin);
+        if (Number.isFinite(Number(priceMax))) params.set('price[lte]', priceMax);
+        if (Number.isFinite(Number(ratingMin)) && Number(ratingMin) > 0) params.set('ratings[gte]', ratingMin);
+        if (availability && availability !== 'all') params.set('availability', availability);
+        if (sort) params.set('sort', sort);
+        params.set('page', page);
+        params.set('limit', limit);
 
-        const { data } = await axios.get(link);
+        const { data } = await axios.get(`/api/v1/products?${params.toString()}`);
 
         dispatch({
             type: ALL_PRODUCT_SUCCESS,
@@ -304,8 +309,11 @@ export const searchProducts = (filters = {}) => async (dispatch) => {
     try {
         dispatch({ type: SEARCH_PRODUCTS_REQUEST });
 
-        // Destructure the filters with default values
-        const { keyword = '', price = {}, ratings = 0 } = filters;
+        const {
+            keyword = '', category = '', priceMin, priceMax,
+            ratingMin, availability = 'all', sort = 'newest',
+            page = 1, limit = 8
+        } = filters;
 
         // Use URLSearchParams to build the query string dynamically
         const params = new URLSearchParams();
@@ -313,15 +321,14 @@ export const searchProducts = (filters = {}) => async (dispatch) => {
         if (keyword) {
             params.append('keyword', keyword);
         }
-        if (price.lte) {
-            params.append('price[lte]', price.lte);
-        }
-        if (price.gte) {
-            params.append('price[gte]', price.gte);
-        }
-        if (ratings > 0) {
-            params.append('ratings[gte]', ratings);
-        }
+        if (category) params.append('category', category);
+        if (Number.isFinite(Number(priceMax))) params.append('price[lte]', priceMax);
+        if (Number.isFinite(Number(priceMin))) params.append('price[gte]', priceMin);
+        if (Number.isFinite(Number(ratingMin)) && Number(ratingMin) > 0) params.append('ratings[gte]', ratingMin);
+        if (availability && availability !== 'all') params.append('availability', availability);
+        if (sort) params.append('sort', sort);
+        params.append('page', page);
+        params.append('limit', limit);
 
         const { data } = await axios.get(`/api/v1/search?${params.toString()}`);
 

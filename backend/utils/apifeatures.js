@@ -7,7 +7,7 @@ class ApiFeatures {
     search() {
         const keyword = this.queryStr.keyword ? {
             name: {
-                $regex: this.queryStr.keyword,
+                $regex: String(this.queryStr.keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
                 $options: "i",
             }
         } : { }
@@ -17,27 +17,58 @@ class ApiFeatures {
     }
 
     filter() {
-      const queryCopy = { ...this.queryStr };
+      const filters = {};
+      const category = typeof this.queryStr.category === 'string'
+          ? this.queryStr.category.trim()
+          : '';
+      const price = {};
+      const minPrice = Number(this.queryStr['price[gte]']);
+      const maxPrice = Number(this.queryStr['price[lte]']);
+      const minRating = Number(this.queryStr['ratings[gte]']);
 
-      // removing some field for category
-      const removeFields = ["keyword", "page", "limit"];
+      if (category) filters.category = category;
+      if (Number.isFinite(minPrice) && minPrice >= 0) price.$gte = minPrice;
+      if (Number.isFinite(maxPrice) && maxPrice >= 0) price.$lte = maxPrice;
+      if (Object.keys(price).length) {
+          if (price.$gte !== undefined && price.$lte !== undefined && price.$gte > price.$lte) {
+              [price.$gte, price.$lte] = [price.$lte, price.$gte];
+          }
+          filters.price = price;
+      }
+      if (Number.isFinite(minRating) && minRating >= 0 && minRating <= 5) {
+          filters.ratings = { $gte: minRating };
+      }
+      if (this.queryStr.availability === 'in-stock') filters.Stock = { $gt: 0 };
+      if (this.queryStr.availability === 'out-of-stock') filters.Stock = { $lte: 0 };
 
-      removeFields.forEach((key) => delete queryCopy[key]);
-
-      // filter for pricing and rating
-      let queryStr = JSON.stringify(queryCopy);
-      queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, key => `$${key}`)
-
-      this.query = this.query.find(JSON.parse(queryStr));
+      this.query = this.query.find(filters);
       return this;
     }
 
+    sort() {
+        const sortMap = {
+            price_asc: { price: 1 },
+            price_desc: { price: -1 },
+            rating_desc: { ratings: -1, numOfReviews: -1 },
+            newest: { createdAt: -1 },
+            name_asc: { name: 1 }
+        };
+
+        this.query = this.query.sort(sortMap[this.queryStr.sort] || { createdAt: -1 });
+        return this;
+    }
+
     pagination(resultPerPage) {
-        const currentPage = Number(this.queryStr.page) || 1;
+        const parsedPage = Number(this.queryStr.page);
+        const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+        const parsedLimit = Number(this.queryStr.limit);
+        const limit = Number.isInteger(parsedLimit) && parsedLimit > 0
+            ? Math.min(parsedLimit, 50)
+            : resultPerPage;
 
-        const skip = resultPerPage * (currentPage - 1);
+        const skip = limit * (currentPage - 1);
 
-        this.query = this.query.limit(resultPerPage).skip(skip);
+        this.query = this.query.limit(limit).skip(skip);
 
         return this;
     } 
