@@ -24,8 +24,24 @@ const NotificationListener = () => {
             dispatch({ type: NOTIFICATION_RECEIVED, payload: notification });
         };
 
+        const handleWishlistAlert = payload => {
+            dispatch({
+                type: NOTIFICATION_RECEIVED,
+                payload: {
+                    id: `${payload.type}:${payload.productId}:${payload.timestamp}`,
+                    title: payload.type === 'PRICE_DROP' ? 'Price drop alert' : 'Back-in-stock alert',
+                    message: payload.message,
+                    createdAt: payload.timestamp
+                }
+            });
+        };
+
         socket.on('orderStatusUpdated', handleOrderStatusUpdated);
-        return () => socket.off('orderStatusUpdated', handleOrderStatusUpdated);
+        socket.on('wishlistAlert', handleWishlistAlert);
+        return () => {
+            socket.off('orderStatusUpdated', handleOrderStatusUpdated);
+            socket.off('wishlistAlert', handleWishlistAlert);
+        };
     }, [dispatch, isAuthenticated]);
 
     return null;

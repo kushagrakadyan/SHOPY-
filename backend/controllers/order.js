@@ -1,6 +1,7 @@
 const Order = require('../models/order');
 const Product = require('../models/product');
 const Snowflake = require('@theinternetfolks/snowflake');
+const { notifyWishlistProductChange } = require('../services/wishlistAlertService');
 
 const createId = () => Snowflake.Snowflake.generate();
 
@@ -86,7 +87,7 @@ exports.updateOrder = async (req, res) => {
 
         if (req.body.status === 'Shipped') {
             for (const item of order.orderItems) {
-                await updateStock(item.product, item.quantity);
+                await updateStock(item.product, item.quantity, req.app);
             }
         }
 
@@ -143,11 +144,26 @@ exports.reorder = async (req, res) => {
     }
 };
 
-async function updateStock(id, quantity) {
+async function updateStock(id, quantity, app) {
     const product = await Product.findById(id);
     if (!product) {
         return;
     }
-    product.Stock = Number(product.Stock || 0) - Number(quantity || 0);
+    const oldStock = Number(product.Stock || 0);
+    product.Stock = oldStock - Number(quantity || 0);
     await product.save({ validateBeforeSave: false });
+
+    try {
+        await notifyWishlistProductChange({
+            app,
+            productId: product._id,
+            productName: product.name,
+            oldPrice: product.price,
+            newPrice: product.price,
+            oldStock,
+            newStock: product.Stock
+        });
+    } catch (alertError) {
+        console.error('Wishlist stock alert error:', alertError.message);
+    }
 }

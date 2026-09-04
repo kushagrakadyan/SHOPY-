@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const User = require('../models/user');
 const ApiFeatures = require('../utils/apifeatures');
 const Snowflake = require('@theinternetfolks/snowflake');
+const { notifyWishlistProductChange } = require('../services/wishlistAlertService');
 
 const createId = () => Snowflake.Snowflake.generate();
 
@@ -78,6 +79,11 @@ exports.getProductDetails = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
+        const existingProduct = await Product.findById(req.params.id);
+        if (!existingProduct) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
         const update = { ...req.body };
 
         if (req.files && req.files.length) {
@@ -92,6 +98,20 @@ exports.updateProduct = async (req, res) => {
 
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        try {
+            await notifyWishlistProductChange({
+                app: req.app,
+                productId: product._id,
+                productName: product.name,
+                oldPrice: existingProduct.price,
+                newPrice: product.price,
+                oldStock: existingProduct.Stock,
+                newStock: product.Stock
+            });
+        } catch (alertError) {
+            console.error('Wishlist alert error:', alertError.message);
         }
 
         res.status(200).json({ success: true, product });
