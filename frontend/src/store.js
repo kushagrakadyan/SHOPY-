@@ -39,6 +39,7 @@ import { contactReducer } from './reducers/contactReducer';
 import { subscribeReducer } from './reducers/subscribeReducer';
 import { serverReducer } from './reducers/serverReducer';
 import { recommendationReducer } from './reducers/recommendationReducer';
+import { notificationReducer } from './reducers/notificationReducer';
 
 const reducer = combineReducers({
     // product reducer
@@ -88,6 +89,7 @@ const reducer = combineReducers({
     // server reducer
     server: serverReducer,
     recommendations: recommendationReducer,
+    notifications: notificationReducer,
 
 });
 

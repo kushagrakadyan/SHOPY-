@@ -41,6 +41,9 @@ const OrderDetails = () => {
 
     const onLoaderFinished = () => setProgress(0);
 
+    const statusSteps = ['Processing', 'Shipped', 'Delivered'];
+    const currentStatusIndex = statusSteps.indexOf(order.orderStatus);
+
     const returnReasons = [
         'Defective Product',
         'Wrong Product Shipped',
@@ -167,6 +170,16 @@ const OrderDetails = () => {
                                         {order.orderStatus && order.orderStatus}
                                     </p>
                                 </div>
+                            </div>
+                            <div className='order-status-tracker' aria-label='Order status tracker'>
+                                {statusSteps.map((status, index) => (
+                                    <span
+                                        key={status}
+                                        className={index <= currentStatusIndex ? 'greenColor' : ''}
+                                    >
+                                        {status}{index < statusSteps.length - 1 ? ' -> ' : ''}
+                                    </span>
+                                ))}
                             </div>
                             <div className='returnButtonContainer'>
                                 <button

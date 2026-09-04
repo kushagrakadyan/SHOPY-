@@ -20,7 +20,7 @@ import RecommendedProducts from './RecommendedProducts';
 import './ProductDetails.css';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
-import io from 'socket.io-client';
+import { getSocket } from '../../utils/socket';
 
 const ProductDetails = () => {
     const dispatch = useDispatch();
@@ -149,10 +149,7 @@ const ProductDetails = () => {
     }, [dispatch, isAuthenticated]);
 
     useEffect(() => {
-        const socket = io(
-            process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_API_URL || window.location.origin,
-            { withCredentials: true }
-        );
+        const socket = getSocket();
 
         socket.emit('joinProductRoom', id);
 
@@ -185,7 +182,6 @@ const ProductDetails = () => {
             socket.off('productUpdate', handleProductUpdate);
             socket.off('reviewUpdate', handleReviewUpdate);
             socket.off('summaryUpdate', handleSummaryUpdate);
-            socket.disconnect();
         };
     }, [dispatch, id]);
 

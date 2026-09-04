@@ -46,6 +46,7 @@ import store from './store';
 import './App.css';
 import Payment from './components/Cart/Payment';
 import BackendWaker from './components/layout/Server-Health/BackendWaker';
+import NotificationListener from './components/layout/Notifications/NotificationListener';
 
 function App() {
     const { isAuthenticated } = useSelector(state => state.user);
@@ -79,6 +80,7 @@ function App() {
 
     return (
         <Fragment>
+            <NotificationListener />
             <BackendWaker>
                 {!isAdminRoute && <MainHeader />}
                 {isAdminRoute && <AdminHeader />}

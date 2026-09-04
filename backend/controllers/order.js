@@ -98,6 +98,15 @@ exports.updateOrder = async (req, res) => {
 
         await order.save({ validateBeforeSave: false });
 
+        const socketio = req.app.get('socketio');
+        if (socketio) {
+            socketio.to(`user:${order.user}`).emit('orderStatusUpdated', {
+                orderId: order._id,
+                status: order.orderStatus,
+                message: `Your order status is now ${order.orderStatus}.`
+            });
+        }
+
         res.status(200).json({ success: true, order });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

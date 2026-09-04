@@ -36,6 +36,7 @@ import {
     ALL_REFUNDS_FAIL,
     CLEAR_ERRORS
 } from '../constants/orderConstants';
+import { ORDER_STATUS_UPDATED } from '../constants/orderConstants';
 
 export const newOrderReducer = (state = {}, action) => {
     switch (action.type) {
@@ -86,6 +87,15 @@ export const myOrdersReducer = (state = { orders: [] }, action) => {
                 loading: false,
                 error: action.payload,
                 orders: []
+            };
+        case ORDER_STATUS_UPDATED:
+            return {
+                ...state,
+                orders: state.orders.map(order =>
+                    String(order._id) === String(action.payload.orderId)
+                        ? { ...order, orderStatus: action.payload.status }
+                        : order
+                )
             };
         case CLEAR_ERRORS:
             return {
@@ -199,6 +209,17 @@ export const orderDetailsReducer = (state = { order: {} }, action) => {
             return {
                 loading: false,
                 error: action.payload,
+            };
+        case ORDER_STATUS_UPDATED:
+            if (!state.order || String(state.order._id) !== String(action.payload.orderId)) {
+                return state;
+            }
+            return {
+                ...state,
+                order: {
+                    ...state.order,
+                    orderStatus: action.payload.status
+                }
             };
         case CLEAR_ERRORS:
             return {
