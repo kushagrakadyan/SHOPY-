@@ -175,6 +175,10 @@ exports.deleteReview = async (req, res) => {
 
 exports.addToWishList = async (req, res) => {
     try {
+        if (!req.params.id || typeof req.params.id !== 'string') {
+            return res.status(400).json({ success: false, message: 'Product id is required' });
+        }
+
         const product = await Product.findById(req.params.id);
 
         if (!product) {
@@ -182,7 +186,13 @@ exports.addToWishList = async (req, res) => {
         }
 
         const user = await User.findById(req.user._id);
-        const exists = user.wishlist.some((item) => String(item._id) === String(product._id));
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const exists = user.wishlist.some((item) =>
+            String(item.product || item._id) === String(product._id)
+        );
 
         if (!exists) {
             user.wishlist.push(product.toObject());
@@ -197,8 +207,18 @@ exports.addToWishList = async (req, res) => {
 
 exports.removeFromWishList = async (req, res) => {
     try {
+        if (!req.params.id || typeof req.params.id !== 'string') {
+            return res.status(400).json({ success: false, message: 'Product id is required' });
+        }
+
         const user = await User.findById(req.user._id);
-        user.wishlist = user.wishlist.filter((item) => String(item._id) !== String(req.params.id));
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        user.wishlist = user.wishlist.filter((item) =>
+            String(item.product || item._id) !== String(req.params.id)
+        );
         await user.save({ validateBeforeSave: false });
 
         res.status(200).json({ success: true, wishlist: user.wishlist });
@@ -210,7 +230,21 @@ exports.removeFromWishList = async (req, res) => {
 exports.getAllWishlistProducts = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
-        res.status(200).json({ success: true, wishlistProducts: user.wishlist });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const uniqueWishlist = [];
+        const seenProducts = new Set();
+        user.wishlist.forEach((item) => {
+            const productId = String(item.product || item._id);
+            if (!seenProducts.has(productId)) {
+                seenProducts.add(productId);
+                uniqueWishlist.push(item);
+            }
+        });
+
+        res.status(200).json({ success: true, wishlistProducts: uniqueWishlist });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
