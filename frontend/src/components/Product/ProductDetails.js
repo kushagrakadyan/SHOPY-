@@ -21,6 +21,7 @@ import './ProductDetails.css';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
 import { getSocket } from '../../utils/socket';
+import { addRecentlyViewed } from '../../utils/recentlyViewed';
 
 const ProductDetails = () => {
     const dispatch = useDispatch();
@@ -141,6 +142,12 @@ const ProductDetails = () => {
             clearTimeout(timer);
         }
     }, [dispatch, id, error, reviewError, success, isSummarized]);
+
+    useEffect(() => {
+        if (product && product._id && !loading && !error) {
+            addRecentlyViewed(product);
+        }
+    }, [product, loading, error]);
 
     useEffect(() => {
         if (isAuthenticated) {

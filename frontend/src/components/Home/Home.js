@@ -12,12 +12,14 @@ import ProductGridItem from './ProductGridItem';
 
 import './Home.css';
 import ThreeJSMacbookBanner from './ThreeJSMacbookBanner';
+import { getRecentlyViewed } from '../../utils/recentlyViewed';
 
 const Home = () => {
     const dispatch = useDispatch();
 
     const [email, setEmail] = useState('');
     const [progress, setProgress] = useState(0);
+    const [recentlyViewed, setRecentlyViewed] = useState([]);
 
     const onLoaderFinished = () => setProgress(0);
 
@@ -30,6 +32,10 @@ const Home = () => {
         setEmail('');
         setProgress(50);
     };
+
+    useEffect(() => {
+        setRecentlyViewed(getRecentlyViewed().slice(0, 6));
+    }, []);
 
     useEffect(() => {
         if (subscribeSuccess) {
@@ -64,6 +70,17 @@ const Home = () => {
                     <MetaData title='Order Planning' />
 
                     <ThreeJSMacbookBanner />
+
+                    {recentlyViewed.length > 0 && (
+                        <Fragment>
+                            <h2 className='homeHeading'>Recently Viewed</h2>
+                            <div className='new-drop-container'>
+                                {recentlyViewed.map(product => (
+                                    <ProductCard key={product._id} product={product} />
+                                ))}
+                            </div>
+                        </Fragment>
+                    )}
 
                     {/* <h2 className='homeHeading'>Featured Products</h2>
 
