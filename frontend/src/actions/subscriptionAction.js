@@ -1,4 +1,5 @@
 import axios from '../utils/axiosConfig';
+import { getErrorMessage } from '../utils/apiError';
 
 import {
     CREATE_SUBSCRIPTION_REQUEST,
@@ -36,7 +37,7 @@ export const getAllPrices = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: ALL_PRICES_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -61,7 +62,7 @@ export const createSubscription = (myForm) => async dispatch => {
     } catch (error) {
         dispatch({
             type: CREATE_SUBSCRIPTION_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -80,7 +81,7 @@ export const getAllSubscription = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: SUBSCRIPTION_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -98,7 +99,7 @@ export const getSubscriptionDetails = (id) => async dispatch => {
     } catch (error) {
         dispatch({
             type: GET_SUBSCRIPTION_DETAIL_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -128,7 +129,7 @@ export const updateSubscriptionById = (id, myForm) => async dispatch => {
     } catch (error) {
         dispatch({
             type: UPDATE_SUBSCRIPTION_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -147,7 +148,7 @@ export const deleteSubscription = (id) => async dispatch => {
     } catch (error) {
         dispatch({
             type: DELETE_SUBSCRIPTION_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -166,7 +167,7 @@ export const cancelSubscription = (id) => async dispatch => {
     } catch (error) {
         dispatch({
             type: CANCEL_SUBSCRIPTION_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };

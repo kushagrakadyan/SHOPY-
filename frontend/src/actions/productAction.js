@@ -1,4 +1,5 @@
 import axios from '../utils/axiosConfig';
+import { getErrorMessage } from '../utils/apiError';
 
 import { ADD_PRODUCT_TO_WISHLIST_FAIL, 
     ADD_PRODUCT_TO_WISHLIST_REQUEST, 
@@ -71,7 +72,7 @@ export const getProduct = (
     } catch (error) {
         dispatch({
             type: ALL_PRODUCT_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -91,7 +92,7 @@ export const getAdminProduct = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: ADMIN_PRODUCT_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -112,7 +113,7 @@ export const createProduct = productData => async dispatch => {
     } catch (error) {
         dispatch({
             type: NEW_PRODUCT_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -133,7 +134,7 @@ export const updateProduct = (id, productData) => async dispatch => {
     } catch (error) {
         dispatch({
             type: UPDATE_PRODUCT_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -152,7 +153,7 @@ export const deleteProduct = id => async dispatch => {
     } catch (error) {
         dispatch({
             type: DELETE_PRODUCT_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -171,7 +172,7 @@ export const getProductDetails = id => async dispatch => {
     } catch (error) {
         dispatch({
             type: PRODUCT_DETAILS_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -195,7 +196,7 @@ export const newReview = reviewData => async dispatch => {
     } catch (error) {
         dispatch({
             type: NEW_REVIEW_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -214,7 +215,7 @@ export const getAllReviews = id => async dispatch => {
     } catch (error) {
         dispatch({
             type: ALL_REVIEW_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -236,7 +237,7 @@ export const deleteReviews = (reviewId, productId) => async dispatch => {
     } catch (error) {
         dispatch({
             type: DELETE_REVIEW_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -255,7 +256,7 @@ export const fetchWishlist = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: ALL_WISHLIST_PRODUCTS_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -274,7 +275,7 @@ export const addProductToWishlist = (id) => async dispatch => {
     } catch (error) {
         dispatch({
             type: ADD_PRODUCT_TO_WISHLIST_FAIL,
-            payload: error.response.data.message
+               payload: getErrorMessage(error)
         });
     }
 };
@@ -294,9 +295,7 @@ export const removeProductFromWishlist = id => async dispatch => {
                dispatch({
                    type: REMOVE_PRODUCT_FROM_WISHLIST_FAIL,
                    payload:
-                       error.response && error.response.data.message
-                           ? error.response.data.message
-                           : error.message
+                       getErrorMessage(error)
                });
            }
        };
@@ -333,7 +332,7 @@ export const searchProducts = (filters = {}) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: SEARCH_PRODUCTS_FAIL,
-            payload: error.response?.data?.message || 'An error occurred',
+               payload: getErrorMessage(error),
         });
     }
 };
@@ -363,7 +362,7 @@ export const summarizeProductReviews = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: SUMMARIZE_REVIEWS_FAIL,
-            payload: error.response.data.message,
+               payload: getErrorMessage(error),
         });
     }
 };

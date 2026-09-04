@@ -1,4 +1,5 @@
 import axios from '../utils/axiosConfig';
+import { getErrorMessage } from '../utils/apiError';
 import {
     CONTACT_REQUEST,
     CONTACT_SUCCESS,
@@ -18,7 +19,7 @@ export const submitContactForm = myForm => async dispatch => {
         console.log('error', error);
         dispatch({
             type: CONTACT_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };

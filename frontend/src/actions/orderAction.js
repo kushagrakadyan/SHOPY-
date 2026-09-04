@@ -36,6 +36,7 @@ import {
 } from '../constants/orderConstants';
 
 import axios from '../utils/axiosConfig';
+import { getErrorMessage } from '../utils/apiError';
 
 // Create Order
 export const createOrder = order => async dispatch => {
@@ -53,7 +54,7 @@ export const createOrder = order => async dispatch => {
     } catch (error) {
         dispatch({
             type: CREATE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -69,7 +70,7 @@ export const myOrders = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: MY_ORDERS_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -85,7 +86,7 @@ export const getAllOrders = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: ALL_ORDERS_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -110,7 +111,7 @@ export const updateOrder = (id, status) => async dispatch => {
     } catch (error) {
         dispatch({
             type: UPDATE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -126,7 +127,7 @@ export const deleteOrder = id => async dispatch => {
     } catch (error) {
         dispatch({
             type: DELETE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -142,7 +143,7 @@ export const getOrderDetails = id => async dispatch => {
     } catch (error) {
         dispatch({
             type: ORDER_DETAILS_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -170,7 +171,7 @@ export const returnRequest = (id, returnReason) => async dispatch => {
     } catch (error) {
         dispatch({
             type: REQUEST_RETURN_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -185,7 +186,7 @@ export const initiateRefund = id => async dispatch => {
     } catch (error) {
         dispatch({
             type: INITIATE_REFUND_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -218,7 +219,7 @@ export const updateRefundStatus = (
     } catch (error) {
         dispatch({
             type: REFUND_STATUS_UPDATE_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -233,7 +234,7 @@ export const allRefunds = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: ALL_REFUNDS_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -248,7 +249,7 @@ export const allReturns = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: ALL_RETURNS_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };

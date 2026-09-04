@@ -1,4 +1,5 @@
 import axios from '../utils/axiosConfig';
+import { getErrorMessage } from '../utils/apiError';
 import {
     SUBSCRIBE_REQUEST,
     SUBSCRIBE_SUCCESS,
@@ -28,7 +29,7 @@ export const newsletter = email => async dispatch => {
     } catch (error) {
         dispatch({
             type: SUBSCRIBE_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };

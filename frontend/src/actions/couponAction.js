@@ -7,6 +7,7 @@ import {
     FETCH_COUPONS_FAIL
 } from '../constants/couponConstants';
 import axios from '../utils/axiosConfig';
+import { getErrorMessage } from '../utils/apiError';
 
 export const generateCoupon = (code, discount) => async dispatch => {
     try {
@@ -30,7 +31,7 @@ export const generateCoupon = (code, discount) => async dispatch => {
     } catch (error) {
         dispatch({
             type: GENERATE_COUPON_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
@@ -45,7 +46,7 @@ export const getAllCoupons = () => async dispatch => {
     } catch (error) {
         dispatch({
             type: FETCH_COUPONS_FAIL,
-            payload: error.response.data.message
+            payload: getErrorMessage(error)
         });
     }
 };
