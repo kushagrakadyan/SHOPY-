@@ -130,35 +130,6 @@ Interactive charts and visualizations can be implemented using **Recharts or Cha
 * Cloudinary — Image and Media Storage
 * Nodemailer — Email Notifications
 
-
-**High-Level Architecture**
-
-                    ┌──────────────┐
-                    │    User      │
-                    └──────┬───────┘
-                           ↓
-                    ┌──────────────┐
-                    │ React        │
-                    │ Redux        │
-                    │ Tailwind CSS │
-                    └──────┬───────┘
-                           ↓
-                       REST API
-                           ↓
-                    ┌──────────────┐
-                    │ Node.js      │
-                    │ Express.js   │
-                    │ JWT / RBAC   │
-                    └──────┬───────┘
-                           ↓
-                    ┌──────────────┐
-                    │ MongoDB      │
-                    │ Mongoose     │
-                    └──────────────┘
-                           │
-             ┌─────────────┼─────────────┐
-             ↓             ↓             ↓
-        Cloudinary       Stripe       Nodemailer
 ### Deployment
 
 The application can be deployed using modern cloud platforms such as:
