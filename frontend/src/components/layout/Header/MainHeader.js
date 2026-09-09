@@ -6,9 +6,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios'; // Import axios
+import axios from '../../../utils/axiosConfig';
 
 import { logout } from '../../../actions/userAction';
+import NotificationBell from '../Notifications/NotificationBell';
 import './MainHeader.css';
 
 const useDebounce = (value, delay) => {
@@ -144,6 +145,8 @@ const MainHeader = () => {
                             <FavoriteIcon className='wishlistIcon' />
                         </div>
                     </Link>
+
+                    {isAuthenticated && <NotificationBell />}
 
                     <Link to='/cart' className='nav-link'>
                         <div className='cart-icon-container'>

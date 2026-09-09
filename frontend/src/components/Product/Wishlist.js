@@ -1,5 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import Pagination from 'react-js-pagination';
+import React, { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
@@ -16,31 +15,18 @@ import WishlistProductCard from './WishlistProductCard';
 const Wishlist = () => {
     const dispatch = useDispatch();
 
-    const [currentPage, setCurrentPage] = useState(1);
+    const { loading, error, wishlist } = useSelector(state => state.wishlist);
 
-    const {
-        loading,
-        error,
-        productsCount,
-        resultPerPage,
-        filteredProductsCount
-    } = useSelector(state => state.products);
-
-    const { wishlist } = useSelector(state => state.wishlist);
-
-    const setCurrentPageNo = e => {
-        setCurrentPage(e);
-    };
+    useEffect(() => {
+        dispatch(fetchWishlist());
+    }, [dispatch]);
 
     useEffect(() => {
         if (error) {
             toast.error(error);
             dispatch(clearErrors());
         }
-        dispatch(fetchWishlist());
     }, [dispatch, error]);
-
-    let count = filteredProductsCount;
 
     return (
         <Fragment>
@@ -50,35 +36,17 @@ const Wishlist = () => {
                 <Fragment>
                     <MetaData title='WISHLIST -- ECOMMERCE' />
                     <h2 className='productsHeading'>Wishlist</h2>
-                    <div className='products'>
-                        {wishlist &&
-                            wishlist.map(product => (
+                    {wishlist && wishlist.length > 0 ? (
+                        <div className='products'>
+                            {wishlist.map(product => (
                                 <WishlistProductCard
-                                    key={product._id}
+                                    key={product.product || product._id}
                                     product={product}
                                 />
                             ))}
-                    </div>
-
-                    {resultPerPage < count && (
-                        <div className='paginationBox'>
-                            <Pagination
-                                activePage={currentPage}
-                                itemsCountPerPage={resultPerPage}
-                                totalItemsCount={productsCount}
-                                onChange={setCurrentPageNo}
-                                nextPageText='Next'
-                                prevPageText='Prev'
-                                firstPageText='1st'
-                                lastPageText='Last'
-                                itemClass='page-item'
-                                linkClass='page-link'
-                                activeClass='pageItemActive'
-                                activeLinkClass='pageLinkActive'
-                                hideFirstLastPages={true}
-                                hidePrevNextPages={true}
-                            />
                         </div>
+                    ) : (
+                        <p>Your wishlist is empty.</p>
                     )}
                 </Fragment>
             )}

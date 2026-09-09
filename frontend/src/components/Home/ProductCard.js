@@ -4,10 +4,12 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { addProductToWishlist } from '../../actions/productAction';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const ProductCard = ({ product }) => {
 
     const dispatch = useDispatch();
+    const { isAuthenticated } = useSelector(state => state.user);
     const defaultImageUrl = "https://ecommerce-bucket-sdk.s3.ap-south-1.amazonaws.com/default.jpg";
 
     const options = {
@@ -21,9 +23,13 @@ const ProductCard = ({ product }) => {
     const images = product.images || defaultImageUrl;
 
     const addToWishlist = () => {
-        toast.success('Product added to wishlist');
+        if (!isAuthenticated) {
+            toast.info('Please log in to use your wishlist');
+            return;
+        }
+
         dispatch(addProductToWishlist(product._id));
-    }
+    };
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -58,7 +64,15 @@ const ProductCard = ({ product }) => {
                         </span>
                     </div>
                     <span>{`₹${product.price}`}</span>
-                    <button onClick={addToWishlist} className='addToWishlistButton'>
+                    <button
+                        type='button'
+                        onClick={event => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            addToWishlist();
+                        }}
+                        className='addToWishlistButton'
+                    >
                         Add to Wishlist
                     </button>
                 </Link>

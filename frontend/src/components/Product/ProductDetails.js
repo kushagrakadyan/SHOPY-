@@ -11,15 +11,17 @@ import "yet-another-react-lightbox/styles.css";
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 import { addItemsToCart } from '../../actions/cartAction';
-import { addProductToWishlist, clearErrors, getProductDetails, newReview, summarizeProductReviews } from '../../actions/productAction';
+import { addProductToWishlist, clearErrors, fetchWishlist, getProductDetails, newReview, summarizeProductReviews } from '../../actions/productAction';
 import { NEW_REVIEW_RESET, REALTIME_PRODUCT_UPDATE, SUMMARIZE_REVIEWS_RESET } from '../../constants/productConstants';
 import MetaData from '../layout/MetaData';
 import ReviewCard from './ReviewCard';
+import RecommendedProducts from './RecommendedProducts';
 
 import './ProductDetails.css';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
-import io from 'socket.io-client';
+import { getSocket } from '../../utils/socket';
+import { addRecentlyViewed } from '../../utils/recentlyViewed';
 
 const ProductDetails = () => {
     const dispatch = useDispatch();
@@ -29,7 +31,7 @@ const ProductDetails = () => {
         state => state.productDetails
     );
 
-    const { user } = useSelector(state => state.user);
+    const { user, isAuthenticated } = useSelector(state => state.user);
 
     const { wishlist } = useSelector(state => state.wishlist);
 
@@ -73,13 +75,19 @@ const ProductDetails = () => {
     };
 
     const wishlistHandler = () => {
-        const isProductInWishlist = wishlist.some(item => item.product === id);
+        if (!isAuthenticated) {
+            toast.info('Please log in to use your wishlist');
+            return;
+        }
+
+        const isProductInWishlist = wishlist.some(item =>
+            String(item.product || item._id) === String(id)
+        );
 
         if (isProductInWishlist) {
             toast.info('Product is already in the wishlist');
         } else {
             dispatch(addProductToWishlist(id));
-            toast.success('Item Added To Wishlist');
         }
         setProgress(progress + 80);
     }
@@ -136,7 +144,19 @@ const ProductDetails = () => {
     }, [dispatch, id, error, reviewError, success, isSummarized]);
 
     useEffect(() => {
-        const socket = io("http://localhost:4000");
+        if (product && product._id && !loading && !error) {
+            addRecentlyViewed(product);
+        }
+    }, [product, loading, error]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            dispatch(fetchWishlist());
+        }
+    }, [dispatch, isAuthenticated]);
+
+    useEffect(() => {
+        const socket = getSocket();
 
         socket.emit('joinProductRoom', id);
 
@@ -169,7 +189,6 @@ const ProductDetails = () => {
             socket.off('productUpdate', handleProductUpdate);
             socket.off('reviewUpdate', handleReviewUpdate);
             socket.off('summaryUpdate', handleSummaryUpdate);
-            socket.disconnect();
         };
     }, [dispatch, id]);
 
@@ -301,6 +320,8 @@ const ProductDetails = () => {
                             </div>
                         </div>
                     )}
+
+                    <RecommendedProducts productId={id} />
 
                     <Dialog
                         aria-labelledby='simple-dialog-title'

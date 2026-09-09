@@ -16,10 +16,14 @@ const {
 } = require('../controllers/product');
 
 const { isAuthUser, authRoles } = require('../middleware/auth');
+const { optionalAuthUser } = require('../middleware/auth');
+const { getRecommendations } = require('../controllers/recommendation');
 
 const router = express.Router();
 
 router.get('/products/autocomplete', getAutocompleteSuggestions);
+
+router.get('/recommendations', optionalAuthUser, getRecommendations);
 
 router.route('/products').get(getAllProducts);
 

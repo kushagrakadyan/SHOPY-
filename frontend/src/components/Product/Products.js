@@ -23,12 +23,14 @@ const Products = () => {
     const [price, setPrice] = useState([0, 400000]);
     const [category, setCategory] = useState("");
     const [ratings, setRatings] = useState(0);
+    const [availability, setAvailability] = useState('all');
+    const [sort, setSort] = useState('newest');
     const [progress, setProgress] = useState(0);
 
     const onLoaderFinished = () => setProgress(0);
 
     const { keyword } = useParams();
-    const { products, loading, error, productsCount, resultPerPage, filteredProductsCount } =
+    const { products, loading, error, resultPerPage, filteredProductsCount } =
         useSelector((state) => state.products);
 
     const setCurrentPageNo = (e) => {
@@ -79,12 +81,31 @@ const Products = () => {
             setProgress(0);
         }, 5000);
 
-        dispatch(getProduct(keyword, currentPage, price, category, ratings));
+        dispatch(getProduct({
+            keyword,
+            category,
+            priceMin: price[0],
+            priceMax: price[1],
+            ratingMin: ratings,
+            availability,
+            sort,
+            page: currentPage,
+            limit: 8
+        }));
 
         return () => {
             clearTimeout(timer);
         };
-    }, [dispatch, navigate, keyword, currentPage, price, category, ratings, error]);
+    }, [dispatch, navigate, keyword, currentPage, price, category, ratings, availability, sort, error]);
+
+    const resetFilters = () => {
+        setCurrentPage(1);
+        setPrice([0, 400000]);
+        setCategory('');
+        setRatings(0);
+        setAvailability('all');
+        setSort('newest');
+    };
 
     let count = filteredProductsCount;
 
@@ -167,6 +188,35 @@ const Products = () => {
                                 valueLabelDisplay='auto'
                             />
                         </fieldset>
+                        <label htmlFor='availability-filter'>Availability</label>
+                        <select
+                            id='availability-filter'
+                            value={availability}
+                            onChange={event => {
+                                setAvailability(event.target.value);
+                                setCurrentPage(1);
+                            }}
+                        >
+                            <option value='all'>All products</option>
+                            <option value='in-stock'>In stock</option>
+                            <option value='out-of-stock'>Out of stock</option>
+                        </select>
+                        <label htmlFor='sort-filter'>Sort by</label>
+                        <select
+                            id='sort-filter'
+                            value={sort}
+                            onChange={event => {
+                                setSort(event.target.value);
+                                setCurrentPage(1);
+                            }}
+                        >
+                            <option value='newest'>Newest</option>
+                            <option value='price_asc'>Price: low to high</option>
+                            <option value='price_desc'>Price: high to low</option>
+                            <option value='rating_desc'>Rating: high to low</option>
+                            <option value='name_asc'>Name: A-Z</option>
+                        </select>
+                        <button type='button' onClick={resetFilters}>Reset filters</button>
                     </div>
 
                     {resultPerPage < count && (
@@ -174,7 +224,7 @@ const Products = () => {
                             <Pagination
                                 activePage={currentPage}
                                 itemsCountPerPage={Number(resultPerPage)}
-                                totalItemsCount={productsCount}
+                                totalItemsCount={filteredProductsCount}
                                 onChange={setCurrentPageNo}
                                 nextPageText='Next'
                                 prevPageText='Prev'

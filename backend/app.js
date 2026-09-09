@@ -24,6 +24,7 @@ const jwt = require("jsonwebtoken");
 const Snowflake = require("@theinternetfolks/snowflake");
 const { generateEmbedding } = require('./utils/generateEmbedding');
 const redisClientPromise = require('./config/redisClientUpstash');
+const { notifyWishlistProductChange } = require('./services/wishlistAlertService');
 
 app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
@@ -427,6 +428,20 @@ app.put(
           runValidators: true,
         },
       );
+
+      try {
+        await notifyWishlistProductChange({
+          app,
+          productId: updatedProduct._id,
+          productName: updatedProduct.name,
+          oldPrice: product.price,
+          newPrice: updatedProduct.price,
+          oldStock: product.Stock,
+          newStock: updatedProduct.Stock
+        });
+      } catch (alertError) {
+        console.error("Wishlist alert error:", alertError.message);
+      }
 
       // try {
       //   const redisClient = await redisClientPromise;

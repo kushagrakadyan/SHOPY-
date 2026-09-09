@@ -31,3 +31,22 @@ exports.authRoles = (...roles) => {
       next();
    };
 };
+
+exports.optionalAuthUser = async (req, res, next) => {
+   const { token } = req.cookies || {};
+   if (!token) {
+      return next();
+   }
+
+   try {
+      const decodedToken = await promisify(jwt.verify)(
+          token,
+          process.env.JWT_SECRET_KEY
+      );
+      req.user = await User.findById(decodedToken.id);
+   } catch (error) {
+      req.user = null;
+   }
+
+   next();
+};
