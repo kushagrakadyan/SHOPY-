@@ -1,82 +1,119 @@
 import { Rating } from '@mui/material';
-import React, { Fragment, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { addProductToWishlist } from '../../actions/productAction';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { getProductFallbackImage, getProductImages, PREFER_PROFESSIONAL_IMAGES } from '../../utils/productImages';
 
 const ProductCard = ({ product }) => {
-
     const dispatch = useDispatch();
     const { isAuthenticated } = useSelector(state => state.user);
-    const defaultImageUrl = "https://ecommerce-bucket-sdk.s3.ap-south-1.amazonaws.com/default.jpg";
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [imageFailed, setImageFailed] = useState(false);
+
+    const safeProduct = product || {};
+
+    const productImages = useMemo(() => getProductImages(safeProduct), [product]);
+    const fallbackImage = useMemo(() => getProductFallbackImage(safeProduct), [product]);
+    const displayImages = PREFER_PROFESSIONAL_IMAGES
+        ? [fallbackImage]
+        : (productImages.length ? productImages : [fallbackImage]);
 
     const options = {
         size: 'small',
-        value: product.ratings,
+        value: Number(safeProduct.ratings) || 0,
         readOnly: true,
-        precision: 0.2
+        precision: 0.5
     };
 
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const images = product.images || defaultImageUrl;
+    useEffect(() => {
+        setCurrentImageIndex(0);
+        setImageFailed(false);
+    }, [safeProduct._id]);
 
-    const addToWishlist = () => {
+    useEffect(() => {
+        if (displayImages.length <= 1) return undefined;
+
+        const intervalId = setInterval(() => {
+            setCurrentImageIndex(index => (index + 1) % displayImages.length);
+        }, 3500);
+
+        return () => clearInterval(intervalId);
+    }, [displayImages.length]);
+
+    const addToWishlist = event => {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!isAuthenticated) {
             toast.info('Please log in to use your wishlist');
             return;
         }
 
-        dispatch(addProductToWishlist(product._id));
+        dispatch(addProductToWishlist(safeProduct._id));
     };
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            const nextIndex = (currentImageIndex + 1) % images.length;
-            setCurrentImageIndex(nextIndex);
-        }, 2000);
-
-        return () => clearInterval(intervalId);
-    }, [currentImageIndex, images.length]);
-
-    if (!product) {
-        return null;
-    }
-
-    const imageUrl = images.length > 0 ? images[currentImageIndex]?.url : defaultImageUrl;
+    const imageUrl = imageFailed ? fallbackImage : displayImages[currentImageIndex];
+    const hasDiscount = safeProduct.originalPrice && Number(safeProduct.originalPrice) > Number(safeProduct.price);
+    const discount = hasDiscount
+        ? Math.round(((Number(safeProduct.originalPrice) - Number(safeProduct.price)) / Number(safeProduct.originalPrice)) * 100)
+        : null;
 
     return (
-        <Fragment>
-                <Link className='productCard' to={`/product/${product._id}`}>
-                    <div className='image-container'>
-                        <img
-                            src={imageUrl}
-                            alt={product.name}
-                            className='product-image'
-                        />
+        <Link className='productCard' to={`/product/${safeProduct._id}`}>
+            <div className='productImageWrap'>
+                <div className='productBadges'>
+                    {discount && <span className='discountBadge'>-{discount}%</span>}
+                    {safeProduct.stock === 0 && <span className='stockBadge'>Out of stock</span>}
+                </div>
+
+                <button
+                    type='button'
+                    aria-label='Add product to wishlist'
+                    className='wishlistIcon'
+                    onClick={addToWishlist}
+                >
+                    ♡
+                </button>
+
+                <img
+                    src={imageUrl}
+                    alt={safeProduct.name || 'Product'}
+                    className='product-image'
+                    loading='lazy'
+                    onError={() => {
+                        if (!imageFailed) setImageFailed(true);
+                    }}
+                />
+
+                {displayImages.length > 1 && (
+                    <div className='productImageDots'>
+                        {displayImages.slice(0, 4).map((_, index) => (
+                            <span key={index} className={index === currentImageIndex ? 'active' : ''} />
+                        ))}
                     </div>
-                    <p>{product.name}</p>
-                    <div>
-                        <Rating {...options} />
-                        <span className='productCardSpan'>
-                            ({product.numOfReviews} Reviews)
-                        </span>
-                    </div>
-                    <span>{`₹${product.price}`}</span>
-                    <button
-                        type='button'
-                        onClick={event => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            addToWishlist();
-                        }}
-                        className='addToWishlistButton'
-                    >
-                        Add to Wishlist
-                    </button>
-                </Link>
-        </Fragment>
+                )}
+            </div>
+
+            <div className='productCardInfo'>
+                <span className='productCategory'>{safeProduct.category || 'GENERAL'}</span>
+                <h3 title={safeProduct.name}>{safeProduct.name}</h3>
+
+                <div className='productRatingRow'>
+                    <span className='ratingValue'>{Number(safeProduct.ratings || 0).toFixed(1)}</span>
+                    <Rating {...options} />
+                    <span className='reviewCount'>({safeProduct.numOfReviews || 0})</span>
+                </div>
+
+                <div className='productPriceRow'>
+                    <span className='productPrice'>₹{Number(safeProduct.price || 0).toLocaleString('en-IN')}</span>
+                    {hasDiscount && (
+                        <span className='productOldPrice'>₹{Number(safeProduct.originalPrice).toLocaleString('en-IN')}</span>
+                    )}
+                </div>
+            </div>
+        </Link>
     );
 };
 

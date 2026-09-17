@@ -2,54 +2,49 @@ import React, { useState } from 'react';
 import './ProductGridItem.css';
 import { Rating } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { getProductFallbackImage, getProductImages, PREFER_PROFESSIONAL_IMAGES } from '../../utils/productImages';
 
 const ProductGridItem = ({ product }) => {
     const [hovered, setHovered] = useState(false);
 
-    const handleMouseEnter = () => {
-        setHovered(true);
-    };
+    if (!product) return null;
 
-    const handleMouseLeave = () => {
-        setHovered(false);
-    };
+    const images = getProductImages(product);
+    const fallbackImage = getProductFallbackImage(product);
+    const imageUrl = PREFER_PROFESSIONAL_IMAGES ? fallbackImage : (images[0] || fallbackImage);
 
     const options = {
         size: 'large',
-        value: product.ratings,
-        readOnly: false,
+        value: Number(product.ratings) || 0,
+        readOnly: true,
         precision: 0.5
     };
 
-    if (!product) {
-        return null;
-    }
-
-    const defaultImageUrl = "https://ecommerce-bucket-sdk.s3.ap-south-1.amazonaws.com/default.jpg";
-
-    const imageUrl = product.images && product.images.length > 0 
-        ? product.images[0]?.url 
-        : defaultImageUrl;
-
-    
-
     return (
-        <Link to={`/product/${product._id}`}>
+        <Link to={`/product/${product._id}`} className='productGridLink'>
             <div
                 className='productGridItem'
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
             >
-                <img src={imageUrl} alt={product.name} />
+                <img
+                    src={imageUrl}
+                    alt={product.name || 'Product'}
+                    onError={(event) => {
+                        if (event.currentTarget.src !== fallbackImage) {
+                            event.currentTarget.src = fallbackImage;
+                        }
+                    }}
+                />
 
                 {hovered && (
                     <div className='productGridItemContent'>
                         <p>{product.name}</p>
-                        <span>{`${product.description}`}</span>
-                        <span>{`₹${product.price}`}</span>
+                        <span>{product.description}</span>
+                        <span>₹{Number(product.price || 0).toLocaleString('en-IN')}</span>
                         <Rating {...options} />
                         <span className='productCardSpan'>
-                            ({product.numOfReviews} Reviews)
+                            ({product.numOfReviews || 0} Reviews)
                         </span>
                     </div>
                 )}

@@ -18,6 +18,7 @@ import ReviewCard from './ReviewCard';
 import RecommendedProducts from './RecommendedProducts';
 
 import './ProductDetails.css';
+import { getProductFallbackImage, getProductImages, PREFER_PROFESSIONAL_IMAGES } from '../../utils/productImages';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
 import { getSocket } from '../../utils/socket';
@@ -205,30 +206,44 @@ const ProductDetails = () => {
                     <MetaData title={`${product?.name} -- ECOMMERCE`} />
                     <div className='ProductDetails'>
                         <div>
-                            {product.images && product.images.length > 0 && (
-                                <Carousel showThumbs={false} autoPlay infiniteLoop>
-                                    {product.images.map((item, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => openLightbox(i)}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            <img
-                                                className='CarouselImage'
-                                                src={item.url}
-                                                alt={`${i} Slide`}
-                                            />
-                                        </div>
-                                    ))}
-                                </Carousel>
-                            )}
+                            {(() => {
+                                const productImageUrls = getProductImages(product);
+                                const fallback = getProductFallbackImage(product);
+                                const slides = PREFER_PROFESSIONAL_IMAGES ? [fallback] : (productImageUrls.length ? productImageUrls : [fallback]);
+
+                                return (
+                                    <Carousel showThumbs={false} autoPlay infiniteLoop>
+                                        {slides.map((url, i) => (
+                                            <div
+                                                key={`${url}-${i}`}
+                                                onClick={() => openLightbox(i)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <img
+                                                    className='CarouselImage'
+                                                    src={url}
+                                                    alt={`${product.name || 'Product'} ${i + 1}`}
+                                                    onError={(event) => {
+                                                        if (event.currentTarget.src !== fallback) {
+                                                            event.currentTarget.src = fallback;
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </Carousel>
+                                );
+                            })()}
                         </div>
 
                         {/* 3. The new Lightbox component implementation */}
                         <Lightbox
                             open={lightboxIsOpen}
                             close={() => setLightboxIsOpen(false)}
-                            slides={product.images?.map(item => ({ src: item.url })) || []}
+                            slides={(PREFER_PROFESSIONAL_IMAGES
+                                ? [getProductFallbackImage(product)]
+                                : (getProductImages(product).length ? getProductImages(product) : [getProductFallbackImage(product)])
+                            ).map(src => ({ src }))}
                             index={lightboxImageIndex}
                         />
 

@@ -1,0 +1,50 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { ORDER_STATUS_UPDATED } from '../../../constants/orderConstants';
+import { NOTIFICATION_RECEIVED } from '../../../constants/notificationConstants';
+import { syncSocketAuthentication } from '../../../utils/socket';
+
+const NotificationListener = () => {
+    const dispatch = useDispatch();
+    const { isAuthenticated } = useSelector(state => state.user);
+
+    useEffect(() => {
+        const socket = syncSocketAuthentication(isAuthenticated);
+        if (!isAuthenticated) return undefined;
+
+        const handleOrderStatusUpdated = payload => {
+            const notification = {
+                id: `${payload.orderId}:${payload.status}`,
+                title: `Order #${payload.orderId}`,
+                message: payload.message,
+                createdAt: Date.now()
+            };
+            dispatch({ type: ORDER_STATUS_UPDATED, payload });
+            dispatch({ type: NOTIFICATION_RECEIVED, payload: notification });
+        };
+
+        const handleWishlistAlert = payload => {
+            dispatch({
+                type: NOTIFICATION_RECEIVED,
+                payload: {
+                    id: `${payload.type}:${payload.productId}:${payload.timestamp}`,
+                    title: payload.type === 'PRICE_DROP' ? 'Price drop alert' : 'Back-in-stock alert',
+                    message: payload.message,
+                    createdAt: payload.timestamp
+                }
+            });
+        };
+
+        socket.on('orderStatusUpdated', handleOrderStatusUpdated);
+        socket.on('wishlistAlert', handleWishlistAlert);
+        return () => {
+            socket.off('orderStatusUpdated', handleOrderStatusUpdated);
+            socket.off('wishlistAlert', handleWishlistAlert);
+        };
+    }, [dispatch, isAuthenticated]);
+
+    return null;
+};
+
+export default NotificationListener;
