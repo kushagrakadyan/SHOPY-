@@ -1,4 +1,4 @@
-````markdown
+
 # 🛍️ SHOPY — Multi-Tenant E-Commerce SaaS Platform
 
 <p align="center">
@@ -50,10 +50,6 @@ Instead of every business developing and maintaining a separate e-commerce websi
                                                 │
                                                 ▼
                                             Payments
-````
-
----
-
 # ✨ Key Features
 
 ## 🏪 Multi-Tenant Store Management
