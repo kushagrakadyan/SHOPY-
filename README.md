@@ -1,0 +1,505 @@
+<<<<<<< HEAD Netlify Status
+
+MERN Ecommerce Platform
+A full-stack e-commerce application built with the MERN stack (MongoDB, Express.js, React.js, Node.js) that provides a comprehensive online shopping experience. This platform offers advanced features for both customers and administrators, including secure payments, inventory management, user reviews, and more.
+
+🚀 Features
+🛒 Customer Features
+User Authentication & Security
+
+Secure registration and login with JWT tokens
+Google OAuth integration
+Two-factor authentication (2FA) support
+Password reset functionality
+Role-based access (User/Admin)
+Product Discovery
+
+Browse products by categories
+Advanced search and filtering (price, rating, category)
+Product reviews and ratings
+AI-powered product summaries
+Image galleries for products
+Shopping Experience
+
+Add products to wishlist
+Shopping cart management
+Secure checkout with Stripe payment integration
+Coupon code discounts
+Order tracking and history
+Customer Support
+
+Contact form for inquiries
+Return and refund request system
+Order status updates via email
+Personalization
+
+User profiles with avatar upload
+Wishlist management
+Order history and reordering
+Personalized recommendations (AI-powered embeddings)
+👨‍💼 Admin Features
+Dashboard Management
+
+Comprehensive admin dashboard
+User management and analytics
+Order management and fulfillment
+Product inventory control
+Product Management
+
+Create, update, and delete products
+Category management
+Stock level monitoring
+Image upload to AWS S3
+Order Processing
+
+View and update order status
+Handle returns and refunds
+Payment tracking
+Marketing Tools
+
+Coupon code creation and management
+Email campaigns and notifications
+🔧 Technical Features
+Performance Optimization
+
+Redis caching for 85% performance improvement
+Image optimization and CDN integration
+Database query optimization
+Security
+
+Input validation and sanitization
+Secure payment processing
+CORS configuration
+Rate limiting
+Communication
+
+Email notifications via Amazon SES
+Automated order confirmations
+Password reset emails
+Testing & Quality
+
+Unit tests with Mocha and Chai
+Code quality assurance
+Error handling and logging
+🌟 Premium Features
+Plus Membership
+
+Subscription-based premium features
+Enhanced shopping experience
+Exclusive discounts
+Newsletter Subscription
+
+Email marketing integration
+User engagement tools
+🛠️ Tech Stack
+Backend
+Node.js - Runtime environment
+Express.js - Web framework
+MongoDB - NoSQL database
+Mongoose - ODM for MongoDB
+Redis - Caching layer
+JWT - Authentication
+Stripe - Payment processing
+AWS S3 - File storage
+Amazon SES - Email service
+Frontend
+React.js - UI library
+Redux - State management
+Redux Thunk - Async actions
+React Router - Client-side routing
+Axios - HTTP client
+CSS/Bootstrap - Styling
+DevOps & Tools
+Docker - Containerization
+Git - Version control
+NPM - Package management
+VS Code - Development environment
+📋 Prerequisites
+Node.js (v14 or higher)
+MongoDB
+Redis (optional, for caching)
+AWS account (for S3 and SES)
+Stripe account (for payments)
+🚀 Installation
+Clone the repository
+
+git clone https://github.com/AnantDuhan/MERN-Ecommerce.git
+cd MERN-Ecommerce
+Install dependencies
+
+# Root directory
+npm install
+
+# Backend dependencies
+npm install
+
+# Frontend dependencies
+cd frontend
+npm install
+cd ..
+Environment Setup Create backend/config/config.env with the following variables:
+
+# Database
+DB_URI=mongodb://localhost:27017/mern-ecommerce
+
+# JWT
+JWT_SECRET_KEY=your_jwt_secret
+JWT_EXPIRES_IN=7d
+
+# Server
+PORT=4000
+FRONTEND_URL=http://localhost:3000
+RESULT_PER_PAGE=10
+
+# Stripe Payment
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+
+# Cookies
+COOKIE_EXPIRES=7
+
+# Email (Amazon SES)
+SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+SMTP_PORT=587
+SMTP_SERVICE=SES
+SMTP_MAIL=your-email@example.com
+SMTP_PASSWORD=your-smtp-password
+
+# AWS S3
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_BUCKET_NAME=your_bucket_name
+AWS_BUCKET_REGION=us-east-1
+🏃‍♂️ Running the Application
+Development Mode
+# Start backend server
+npm run dev
+
+# Start frontend (in another terminal)
+cd frontend
+npm start
+Production Build
+# Build frontend
+cd frontend
+npm run build
+cd ..
+
+# Start production server
+npm run production
+🐳 Docker Deployment
+The project includes Docker support for easy deployment.
+
+# Build and run with Docker Compose
+docker-compose up --build
+📡 API Endpoints
+Authentication
+POST /api/v1/user/register - User registration
+POST /api/v1/user/login - User login
+POST /api/v1/user/logout - User logout
+POST /api/v1/user/forgot-password - Password reset request
+Products
+GET /api/v1/products - Get all products
+POST /api/v1/product/new - Create product (Admin)
+GET /api/v1/product/:id - Get product details
+PUT /api/v1/product/:id - Update product (Admin)
+DELETE /api/v1/product/:id - Delete product (Admin)
+Orders
+POST /api/v1/order/new - Create new order
+GET /api/v1/orders/me - Get user's orders
+GET /api/v1/order/:id - Get order details
+PUT /api/v1/order/:id - Update order status (Admin)
+Payments
+POST /api/v1/payment/process - Process payment
+GET /api/v1/stripeapikey - Get Stripe API key
+Coupons
+POST /api/v1/coupon/new - Create coupon (Admin)
+GET /api/v1/coupons - Get all coupons (Admin)
+DELETE /api/v1/coupon/:id - Delete coupon (Admin)
+🚀 Deployment
+Backend on Render
+Connect Repository
+
+Go to Render and sign up/login
+Click "New" → "Blueprint" or "Web Service"
+Connect your GitHub repository
+Configure Service
+
+Name: MERN-Ecommerce-Backend
+Environment: Docker
+Region: Oregon (or your preferred region)
+Branch: main
+Build Command: npm install (handled by Dockerfile)
+Start Command: node backend/server.js (handled by Dockerfile)
+Environment Variables Set the following in Render's Environment section:
+
+DB_URI=your_mongodb_atlas_uri
+JWT_SECRET_KEY=your_jwt_secret
+JWT_EXPIRES_IN=7d
+PORT=4000
+FRONTEND_URL=https://your-vercel-frontend-url.vercel.app
+RESULT_PER_PAGE=10
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+COOKIE_EXPIRES=7
+SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+SMTP_PORT=587
+SMTP_SERVICE=SES
+SMTP_MAIL=your-email@example.com
+SMTP_PASSWORD=your-smtp-password
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_BUCKET_NAME=your_bucket_name
+AWS_BUCKET_REGION=us-east-1
+Deploy
+
+Click "Create Web Service"
+Render will build and deploy your backend
+Note the service URL (e.g., https://mern-ecommerce-backend.onrender.com)
+Frontend on Vercel
+Connect Repository
+
+Go to Vercel and sign up/login
+Click "New Project"
+Import your GitHub repository
+Configure Project
+
+Project Name: MERN-Ecommerce-Frontend
+Framework Preset: Create React App
+Root Directory: frontend
+Build Command: npm run build
+Output Directory: build
+Install Command: npm install
+Environment Variables Set in Vercel's Environment Variables section:
+
+REACT_APP_API_URL=https://your-render-backend-url.onrender.com
+Deploy
+
+Click "Deploy"
+Vercel will build and deploy your frontend
+Get the deployment URL (e.g., https://mern-ecommerce-frontend.vercel.app)
+Alternative: Heroku (Legacy)
+Create a Procfile in the root directory:
+
+web: npm run start:production
+Set environment variables in Heroku dashboard
+
+Deploy:
+
+git push heroku main
+Other Platforms
+The application can be deployed on any platform supporting Node.js:
+
+AWS EC2/ECS: Use Docker or direct Node.js deployment
+DigitalOcean App Platform: Connect repo and configure
+Railway: Automatic deployment from GitHub
+Fly.io: Docker-based deployment
+🤝 Contributing
+Fork the repository
+Create a feature branch (git checkout -b feature/AmazingFeature)
+Commit your changes (git commit -m 'Add some AmazingFeature')
+Push to the branch (git push origin feature/AmazingFeature)
+Open a Pull Request
+📝 Upcoming Features
+ Advanced filtering functionalities
+ Multilingual support
+ AI-powered recommendation system
+ Mobile app development
+ Advanced analytics dashboard
+ Social media integration
+📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+👨‍💻 Author
+Anant Duhan
+
+GitHub: @AnantDuhan
+LinkedIn: @AnantDuhan
+🙏 Acknowledgments
+Thanks to the MERN stack community
+Stripe for payment processing
+AWS for cloud services
+All contributors and users
+⭐ If you found this project helpful, please give it a star!
+
+Install
+Some basic git commands are:
+
+$ git clone https://github.com/AnantDuhan/MERN-Ecommerce.git
+$ cd MERN-Ecommerce
+$ npm install
+For Backend - npm install For Frontend - cd frontend npm install
+
+Env Variables
+Make Sure to Create a config.env file in backend/config directory that include:
+
+DB_URI & JWT_SECRET_KEY & JWT_EXPIRES_IN
+PORT, FRONTEND_URL & RESULT_PER_PAGE
+STRIPE_PUBLISHABLE_KEY & STRIPE_SECRET_KEY
+COOKIE_EXPIRES
+SMTP_HOST, SMTP_PORT & SMTP_SERVICE
+SMTP_MAIL & SMTP_PASSWORD
+AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET_NAME & AWS_BUCKET_REGION
+Heroku Deployment
+> Create a Procfile in the root directory of your application with the following command **web: npm run start:production**
+Simple build for production
+$ npm run production
+Run the application for development
+for frontend
+
+$ npm start
+for backend
+
+$ npm run dev
+Run the application for production
+$ npm run start:production
+Languages & tools
+Mongoose
+Express
+React
+Node
+AWS-S3
+Stripe
+Code Formatter
+Add a .vscode directory
+Create a file settings.json inside .vscode
+Install Prettier - Code formatter in VSCode
+Add the following snippet:
+{
+    "editor.formatOnSave": true,
+    "prettier.singleQuote": true,
+    "prettier.arrowParens": "avoid",
+    "prettier.jsxSingleQuote": true,
+    "prettier.trailingComma": "none",
+    "javascript.preferences.quoteStyle": "single"
+}
+=======
+
+SHOPY — Multi-Tenant E-Commerce SaaS Platform
+SHOPY is a comprehensive Multi-Tenant E-Commerce SaaS Platform built using the MERN Stack, designed to provide a unified ecosystem where multiple independent vendors can create, customize, and manage their own online stores while customers can discover products, add items to their cart, place orders, and complete secure payments through a seamless shopping experience.
+
+The primary objective of SHOPY is to simplify the process of establishing and managing an online business by providing vendors with a centralized platform instead of requiring every business to develop and maintain a separate e-commerce website. Each vendor can operate within an isolated store environment while sharing the same underlying application infrastructure. This makes SHOPY a scalable SaaS-oriented solution suitable for small and medium-sized businesses looking to establish their digital presence.
+
+Project Overview
+SHOPY follows a multi-tenant architecture, where multiple vendors operate independently within the same platform. The system implements role-based access control to provide different functionalities to Super Admins, Vendors, and Customers.
+
+Super Admins have centralized control over the platform and can monitor stores, users, products, orders, and overall business performance. Vendors can register their businesses, create and manage their storefronts, add and update products, manage inventory, monitor orders, and analyze sales performance. Customers can browse products across available stores, manage their shopping cart, place orders, make payments, and track their purchases.
+
+The application is designed with a strong focus on security, scalability, modularity, performance, and maintainability.
+
+Key Features
+Multi-Tenant Store Management
+Independent vendor storefronts within a single platform.
+Tenant-specific data isolation.
+Vendor-specific product and inventory management.
+Store configuration and management.
+Scalable architecture for supporting multiple businesses.
+Role-Based Access Control
+SHOPY provides separate permissions and workflows for:
+
+Super Admin
+Vendor
+Customer
+Authentication and authorization are handled using secure JWT-based authentication, while passwords are protected using Bcrypt.js hashing.
+
+Product & Inventory Management
+Vendors can:
+
+Create new products.
+Update product information.
+Delete products.
+Manage prices.
+Manage stock quantities.
+Upload product images.
+Manage product variants.
+Monitor inventory.
+Product images and media assets are managed using Cloudinary.
+
+Shopping & Checkout
+Customers can:
+
+Browse products.
+View product details.
+Add products to cart.
+Update quantities.
+Remove products.
+Review cart information.
+Proceed through the checkout process.
+Place orders.
+Receive transaction confirmations.
+Global cart state is managed using Redux Toolkit.
+
+Secure Payments
+SHOPY integrates Stripe API to support secure online payments. Payment processing, transaction verification, and order status updates are handled through backend services and Stripe webhooks.
+
+Order Management
+The platform maintains complete order information including:
+
+Customer details.
+Store/vendor information.
+Ordered products.
+Quantities.
+Prices.
+Payment status.
+Order status.
+Transaction details.
+Sales Analytics
+SHOPY provides analytical dashboards for administrators and vendors to monitor important business metrics such as:
+
+Revenue.
+Order volume.
+Sales trends.
+Product performance.
+Store performance.
+Interactive charts and visualizations can be implemented using Recharts or Chart.js.
+
+Email Notifications
+Nodemailer is used for automated email transactions such as:
+
+Registration confirmations.
+Order confirmations.
+Payment notifications.
+Order status updates.
+Technology Stack
+Frontend
+React.js
+Redux Toolkit
+React Router DOM
+Tailwind CSS
+Recharts / Chart.js
+Backend
+Node.js
+Express.js
+JWT
+Bcrypt.js
+Helmet.js
+Database
+MongoDB
+Mongoose
+External Integrations
+Stripe API — Payment Processing
+Cloudinary — Image and Media Storage
+Nodemailer — Email Notifications
+Deployment
+The application can be deployed using modern cloud platforms such as:
+
+Vercel for the frontend.
+Render or AWS for backend services.
+MongoDB Atlas for cloud database hosting.
+Security
+Security is an important part of SHOPY's architecture. The platform uses JWT-based authentication, password hashing with Bcrypt.js, role-based authorization, secure API handling, tenant-specific data isolation, HTTP security headers through Helmet.js, and protected payment workflows.
+
+The multi-tenant architecture ensures that vendors can access and manage only the resources belonging to their respective stores, preventing unauthorized access to another tenant's data.
+
+Project Architecture
+The project follows a modular structure separating frontend, backend, database models, controllers, routes, middleware, services, and reusable components. This separation allows the team to develop different modules independently while maintaining a clean and scalable codebase.
+
+The development workflow follows GitHub-based team collaboration where every team member works on an individual branch. Completed features are reviewed and integrated into the main branch through pull requests.
+
+Development Goal
+The ultimate goal of SHOPY is to create a production-ready e-commerce SaaS platform that demonstrates real-world software engineering practices including full-stack development, REST API design, authentication, authorization, database modeling, multi-tenancy, third-party API integration, payment processing, cloud storage, analytics, Git-based collaboration, testing, and deployment.
+
+SHOPY is being developed as a collaborative team project with a strong emphasis on clean architecture, meaningful GitHub contributions, modular development, secure implementation, and continuous integration of frontend and backend components.
+
+SHOPY — One Platform. Multiple Stores. Seamless Commerce.
+
+328db89ab5ccdb60d2564b2f30d14
